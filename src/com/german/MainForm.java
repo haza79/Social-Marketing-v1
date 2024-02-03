@@ -234,43 +234,46 @@ public class MainForm extends JFrame{
             String password = userAndPass[1];
             loginDialog.isMatch = phpAction.login(encryp.encrypt(username),encryp.encrypt(password));
 
-            if (loginDialog.isMatch == false){
+            if (loginDialog.isMatch == true){
+                id = phpAction.dbUserID;
+                username = encryp.decrypt(phpAction.dbUserUsername);
+                password = encryp.decrypt(phpAction.dbUserPassword);
+                fullName = encryp.decrypt(phpAction.dbUserFullName);
+                email = encryp.decrypt(phpAction.dbUserEmail);
+
+                lbUser.setText(fullName);
+
+                System.out.println("-- user activate license --");
+
+                finalExpiredTime = phpAction.getUserLicenseExpired(id);
+                System.out.println("final expired time from main : "+finalExpiredTime);
+
+                if (finalExpiredTime==null){
+                    System.out.println("null");
+                    stopProgram();
+                    t.stop();
+                }else {
+                    startProgram();
+                    expiredDuration = phpAction.getExpiredDuration();
+                    System.out.println(expiredDuration[0]+","+expiredDuration[1]+","+expiredDuration[2]+","+
+                            expiredDuration[3]+","+expiredDuration[4]+","+expiredDuration[5]);
+                    tfExpired.setText(licenseDateAndTime.dateToString(finalExpiredTime));
+                    t.start();
+                }
+
+                System.out.println("-- user activate license --");
+
+                setVisible(true);
+
+
+                window.setVisible(false);
+                window.dispose();
+
+            }else{
+                loginDialog.loginButton1.doClick();
                 JOptionPane.showMessageDialog(null, "username or password is incorrect","login fail",JOptionPane.ERROR_MESSAGE);
             }
 
-            id = phpAction.dbUserID;
-            username = encryp.decrypt(phpAction.dbUserUsername);
-            password = encryp.decrypt(phpAction.dbUserPassword);
-            fullName = encryp.decrypt(phpAction.dbUserFullName);
-            email = encryp.decrypt(phpAction.dbUserEmail);
-
-            lbUser.setText(fullName);
-
-            System.out.println("-- user activate license --");
-
-            finalExpiredTime = phpAction.getUserLicenseExpired(id);
-            System.out.println("final expired time from main : "+finalExpiredTime);
-
-            if (finalExpiredTime==null){
-                System.out.println("null");
-                stopProgram();
-                t.stop();
-            }else {
-                startProgram();
-                expiredDuration = phpAction.getExpiredDuration();
-                System.out.println(expiredDuration[0]+","+expiredDuration[1]+","+expiredDuration[2]+","+
-                        expiredDuration[3]+","+expiredDuration[4]+","+expiredDuration[5]);
-                tfExpired.setText(licenseDateAndTime.dateToString(finalExpiredTime));
-                t.start();
-            }
-
-            System.out.println("-- user activate license --");
-
-            setVisible(true);
-            loginDialog.dispose();
-
-            window.setVisible(false);
-            window.dispose();
 
         }
 

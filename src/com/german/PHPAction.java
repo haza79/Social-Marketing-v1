@@ -26,6 +26,7 @@ public class PHPAction {
 
     private void registerDb() {
         String url = "jdbc:mysql://34.136.232.236:12577/pantheon";
+//        String url = "jdbc:mysql://34.136.232.236:12577/pantheon";
         String username = "pantheon";
         String password = "n8RM9UxX62fHlK8WZqq3EzwK4YERQesD";
 
