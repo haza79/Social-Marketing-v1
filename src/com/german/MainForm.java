@@ -158,6 +158,7 @@ public class MainForm extends JFrame{
 
 
     MainForm() throws SQLException, ClassNotFoundException, IOException {
+        LoadWebsite.loadWebsite();
         System.out.println(fileOutput);
         JWindow window = new JWindow();
         window.getContentPane().add(

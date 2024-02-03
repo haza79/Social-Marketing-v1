@@ -12,6 +12,10 @@ import java.awt.*;
 import java.awt.Font;
 import java.awt.event.*;
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.sql.SQLException;
@@ -119,6 +123,7 @@ public class LicenseManager extends JFrame{
 
 
     LicenseManager() throws SQLException {
+        LoadWebsite.loadWebsite();
 
         Timer t = new Timer(1000, updateClockAction);
 
