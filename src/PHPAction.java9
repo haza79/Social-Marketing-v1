@@ -1,0 +1,539 @@
+import io.github.bonigarcia.wdm.WebDriverManager;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+
+import javax.swing.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+public class PHPAction {
+
+    public String dbUserID;
+    public String dbUserUsername;
+    public String dbUserPassword;
+    public String dbUserFullName;
+    public String dbUserEmail;
+
+    WebDriver driver ;
+
+    String url = "jdbc:mysql:// sql203.infinityfree.com:3306/data";
+    String username = "epiz_31598956";
+    String password = " FGqBLmlyafmJ";
+
+    private String loginUrl = "http://haza.infinityfreeapp.com/loginCheck.php";
+    private String checkEmailUrl = "http://haza.infinityfreeapp.com/emailCheck.php";
+    private String registerUrl = "http://haza.infinityfreeapp.com/addUser.php";
+    private String showDataByEmailUrl = "http://haza.infinityfreeapp.com/showDataByEmail.php";
+    private String changePasswordUrl = "http://haza.infinityfreeapp.com/changePassword.php";
+    private String isLicenseActivate = "http://haza.infinityfreeapp.com/isLicenseActivate.php";
+    private String activateLicenseUrl = "http://haza.infinityfreeapp.com/activateLicense.php";
+    private String userActivateLicenseUrl = "http://haza.infinityfreeapp.com/showUserActivateLicense.php";
+    private String getLicenseDataUrl = "http://haza.infinityfreeapp.com/showLicenseByName.php";
+    private String licenseManagerUrl = "http://haza.infinityfreeapp.com/licenseManager%20copy.php";
+    private String showAllLicenseUrl = "http://haza.infinityfreeapp.com/showAllLicense.php";
+    private String showUser = "http://haza.infinityfreeapp.com/showAllUser.php";
+    private String deleteLicenseUrl = "http://haza.infinityfreeapp.com/deleteLicense.php";
+    private String updateUserDataUrl = "http://haza.infinityfreeapp.com/updateUserData.php";
+    private String deleteUserUrl = "http://haza.infinityfreeapp.com/deleteUser.php";
+
+    ChromeOptions options = new ChromeOptions();
+    licenseKey licenseKey = new licenseKey();
+    encryption encryp = new encryption();
+    Connection connection;
+    private void registerDriver() throws ClassNotFoundException, SQLException {
+        try {
+            // Register JDBC driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Open a connection
+            connection = DriverManager.getConnection(url, username, password);
+
+            // Check if the connection is successful
+            if (connection != null) {
+                System.out.println("Connected to the database!");
+                connection.close(); // Close the connection when done
+            } else {
+                System.out.println("Failed to connect to the database!");
+            }
+        } catch (ClassNotFoundException e) {
+            System.out.println("MySQL JDBC Driver not found!");
+            e.printStackTrace();
+        } catch (SQLException e) {
+            System.out.println("Connection failed! Check output console");
+            e.printStackTrace();
+        }
+    }
+
+    }
+    PHPAction(){
+        System.out.println("setup driver ...");
+        options.setHeadless(false);
+//        WebDriverManager.chromedriver().setup();
+//        driver = new ChromeDriver(options);
+        options.setBinary("/usr/bin/google-chrome");
+        WebDriverManager.chromedriver().setup();
+        driver = new ChromeDriver(options);
+        System.out.println("setup driver success");
+    }
+
+    public void setupDriver(){
+        System.out.println("setup driver ...");
+        options.setHeadless(true);
+        WebDriverManager.chromedriver().setup();
+        driver = new ChromeDriver(options);
+        System.out.println("setup driver success");
+    }
+
+    public int closeDriver(){
+        driver.quit();
+        return 0;
+    }
+
+    private void submitAction(){
+        driver.findElement(By.xpath("//input[@type = 'submit']")).submit();
+    }
+
+    private boolean getStatus(){
+        boolean isSuccess = false;
+        String status = driver.findElement(By.xpath("//*[@id=\"status\"]")).getText();
+        System.out.println("status : "+status);
+        if (status.equals("success")){
+            isSuccess = true;
+        }else {
+            JOptionPane.showMessageDialog(null, "username or password is incorrect","login fail",JOptionPane.ERROR_MESSAGE);
+            isSuccess =false;
+        }
+        return isSuccess;
+    }
+
+    private boolean getEmailStatus(){
+        boolean isDuplicate = false;
+        String status = driver.findElement(By.xpath("//*[@id=\"status\"]")).getText();
+        System.out.println("status : "+status);
+        if (status.equals("success")){
+//            JOptionPane.showMessageDialog(null, "username or password is incorrect","login fail",JOptionPane.ERROR_MESSAGE);
+            isDuplicate = true;
+        }else {
+
+            isDuplicate =false;
+        }
+        return isDuplicate;
+    }
+
+
+    public boolean isEmailAvailable(String email){
+        driver.get(checkEmailUrl);
+        driver.findElement(By.xpath("/html/body/form/input[1]")).sendKeys(encryp.encrypt(email));
+        submitAction();
+        return getEmailStatus();
+    }
+
+    public void register(String username, String password, String fullName, String email){
+        username = encryp.encrypt(username);
+        password = encryp.encrypt(password);
+        fullName = encryp.encrypt(fullName);
+        email = encryp.encrypt(email);
+
+        driver.get(registerUrl);
+        driver.findElement(By.xpath("/html/body/form/input[1]")).sendKeys(username);
+        driver.findElement(By.xpath("/html/body/form/input[2]")).sendKeys(password);
+        driver.findElement(By.xpath("/html/body/form/input[3]")).sendKeys(fullName);
+        driver.findElement(By.xpath("/html/body/form/input[4]")).sendKeys(email);
+        submitAction();
+    }
+
+    public boolean login(String username, String password){
+
+        driver.get(loginUrl);
+        driver.findElement(By.xpath("/html/body/form/input[1]")).sendKeys(username);
+        driver.findElement(By.xpath("/html/body/form/input[2]")).sendKeys(password);
+        submitAction();
+
+        String status = driver.findElement(By.xpath("//*[@id=\"status\"]")).getText();
+        if (status.equals("success")){// success
+            dbUserID = driver.findElement(By.xpath("//*[@id=\"dbID\"]")).getText();
+            dbUserUsername = driver.findElement(By.xpath("//*[@id=\"dbUsername\"]")).getText();
+            dbUserPassword = driver.findElement(By.xpath("//*[@id=\"dbPassword\"]")).getText();
+            dbUserFullName = driver.findElement(By.xpath("//*[@id=\"dbFullName\"]")).getText();
+            dbUserEmail = driver.findElement(By.xpath("//*[@id=\"dbEmail\"]")).getText();
+        }
+
+        return getStatus();
+    }
+
+    public String[] showDataByEmail(String email){
+        email = encryp.encrypt(email);
+        String[] data  = new String[5];
+        boolean isVisible = false;
+        driver.get(showDataByEmailUrl);
+        driver.findElement(By.xpath("/html/body/form/input[1]")).sendKeys(email);
+        submitAction();
+        String status = driver.findElement(By.xpath("//*[@id=\"status\"]")).getText();
+        if (status.equals("success")){
+            isVisible = true;
+            data[0] = driver.findElement(By.xpath("//*[@id=\"dbID\"]")).getText();
+            data[1] = encryp.decrypt(driver.findElement(By.xpath("//*[@id=\"dbUsername\"]")).getText());
+            data[2] = encryp.decrypt(driver.findElement(By.xpath("//*[@id=\"dbPassword\"]")).getText());
+            data[3] = encryp.decrypt(driver.findElement(By.xpath("//*[@id=\"dbFullName\"]")).getText());
+            data[4] = encryp.decrypt(driver.findElement(By.xpath("//*[@id=\"dbEmail\"]")).getText());
+
+        }else {
+            isVisible = false;
+        }
+
+        return data;
+
+    }
+
+    public boolean changePassword(String userID,String newPassword){
+//        userID = encryp.encrypt(userID);
+        newPassword = encryp.encrypt(newPassword);
+        boolean isUpdate = false;
+        driver.get(changePasswordUrl);
+        driver.findElement(By.xpath("/html/body/form/input[1]")).sendKeys(userID);
+        driver.findElement(By.xpath("/html/body/form/input[2]")).sendKeys(newPassword);
+        submitAction();
+        String status = driver.findElement(By.xpath("//*[@id=\"status\"]")).getText();
+        if (status.equals("success")){
+            isUpdate = true;
+//            JOptionPane.showMessageDialog(null, "change password success","change password",JOptionPane.PLAIN_MESSAGE);
+        }else {
+            isUpdate = false;
+//            JOptionPane.showMessageDialog(null, "change password fail\nplease try again","error",JOptionPane.ERROR_MESSAGE);
+        }
+        return isUpdate;
+    }
+
+
+    public boolean isLicenseActivate(String license){
+        license = encryp.encrypt(license);
+        boolean isActivated = false;
+        driver.get(isLicenseActivate);
+        driver.findElement(By.xpath("/html/body/form/input[1]")).sendKeys(license);
+        submitAction();
+
+        String status = driver.findElement(By.xpath("//*[@id=\"status\"]")).getText();
+        if (status.equals("not use")){
+            isActivated=false;
+        }else {
+            isActivated=true;
+        }
+
+        return isActivated;
+
+    }
+
+    public boolean activateLicense(String license,String userID,String activateTime,String expiredTime){
+        userID = encryp.encrypt(userID);
+        license = encryp.encrypt(license);
+        boolean isActivated = false;
+        driver.get(activateLicenseUrl);
+        driver.findElement(By.xpath("/html/body/form/input[1]")).sendKeys(license);
+        driver.findElement(By.xpath("/html/body/form/input[2]")).sendKeys(userID);
+        driver.findElement(By.xpath("/html/body/form/input[3]")).sendKeys(activateTime);
+        driver.findElement(By.xpath("/html/body/form/input[4]")).sendKeys(expiredTime);
+        submitAction();
+        String status = driver.findElement(By.xpath("//*[@id=\"status\"]")).getText();
+        if (status.equals("success")){
+            isActivated = true;
+            JOptionPane.showMessageDialog(null, "activate license success","license",JOptionPane.PLAIN_MESSAGE);
+        }else {
+            isActivated = false;
+        }
+
+        return isActivated;
+
+        //2022-07-14 00:17:00
+        //14-07-2022 00:07:46
+
+    }
+
+    public ArrayList<ArrayList> getUserActivateLicense(String userID){
+        userID = encryp.encrypt(userID);
+        System.out.println("in get user activate license");
+
+        ////div[@id='data']/div[1]/p[@id='dbID']
+        ArrayList<ArrayList> data = new ArrayList<>();
+
+        driver.get(userActivateLicenseUrl);
+        driver.findElement(By.xpath("/html/body/form/input[1]")).sendKeys(userID);
+        submitAction();
+        List<WebElement> optionCount = driver.findElements(By.xpath("//*[@id=\"data\"]/div"));
+        System.out.println("element size = "+optionCount.size());
+        if (optionCount.size()<=0){
+            data=null;
+        }else {
+            for (int i = 1; i<=optionCount.size(); i++){
+                ArrayList<String> userData = new ArrayList<>();
+                String dbID = driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbID']")).getText();
+                String dbKey = encryp.decrypt(driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbKey']")).getText());
+                String dbDuration = encryp.decrypt(driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbDuration']")).getText());
+                String dbIsActivate = driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbIsActivate']")).getText();
+                String dbActivateByUser = encryp.decrypt(driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbActivateByUser']")).getText());
+                String dbActivateTime = driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbActivateTime']")).getText();
+                String dbExpiredTime = driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbExpiredTime']")).getText();
+
+                userData.add(dbID);
+                userData.add(dbKey);
+                userData.add(dbDuration);
+                userData.add(dbIsActivate);
+                userData.add(dbActivateByUser);
+                userData.add(dbActivateTime);
+                userData.add(dbExpiredTime);
+
+                data.add(userData);
+            }
+        }
+
+
+
+//        System.out.println(data);
+        System.out.println("data = "+data);
+        return data;
+    }
+
+    public String[] getLicenseData(String key){
+
+        key = encryp.encrypt(key);
+        String[] data = new String[7];
+        driver.get(getLicenseDataUrl);
+
+        driver.findElement(By.xpath("/html/body/form/input[1]")).sendKeys(key);
+        submitAction();
+
+        data[0] = encryp.decrypt(driver.findElement(By.xpath("//*[@id=\"dbID\"]")).getText());
+        data[1] = encryp.decrypt(driver.findElement(By.xpath("//*[@id=\"dbKey\"]")).getText());
+        data[2] = encryp.decrypt(driver.findElement(By.xpath("//*[@id=\"dbDuration\"]")).getText());
+        data[3] = encryp.decrypt(driver.findElement(By.xpath("//*[@id=\"dbIsActivate\"]")).getText());
+        data[4] = encryp.decrypt(driver.findElement(By.xpath("//*[@id=\"dbActivateByUser\"]")).getText());
+        data[5] = encryp.decrypt(driver.findElement(By.xpath("//*[@id=\"dbActivateTime\"]")).getText());
+        data[6] = encryp.decrypt(driver.findElement(By.xpath("//*[@id=\"dbExpiredTime\"]")).getText());
+
+        return data;
+
+    }
+
+    private LocalDateTime finalExpiredTime = null;
+
+    public LocalDateTime getUserLicenseExpired(String userID){
+
+//        userID = encryp.encrypt(userID);
+        ArrayList<ArrayList> licenseDate = getUserActivateLicense(userID);
+        System.out.println("license date "+licenseDate);
+        if (licenseDate==null){
+            System.out.println("license date = null");
+            finalExpiredTime = null;
+
+        }else {
+            System.out.println("license date = not null "+licenseDate);
+            ArrayList<Integer> totalDuration = new ArrayList<>();
+            ArrayList<String> allStartdate = new ArrayList<>();
+            ArrayList<String> allEnddate = new ArrayList<>();
+
+            for (int i = 0; i<licenseDate.size(); i++){
+                System.out.println(licenseDate.get(i)+"\n");
+
+                String durationString = (String) licenseDate.get(i).get(2);
+                String startDate = (String) licenseDate.get(i).get(5);
+                String endDate = (String) licenseDate.get(i).get(6);
+
+                if (licenseDateAndTime.getStartTime().isBefore(licenseDateAndTime.stringToDate(endDate))){
+                    totalDuration.add(Integer.valueOf(durationString));
+                    allStartdate.add(startDate);
+                }
+
+
+            }
+
+            if (allStartdate.isEmpty()){
+                finalExpiredTime = null;
+            }else {
+                finalExpiredTime = licenseDateAndTime.getFinalExpiredTime(allStartdate,totalDuration);
+                System.out.println(finalExpiredTime);
+            }
+
+        }
+
+        System.out.println("final expired from php action : "+finalExpiredTime);
+        return finalExpiredTime;
+    }
+
+    public long[] getExpiredDuration(){
+
+        LocalDateTime dateNow = licenseDateAndTime.getStartTime();
+        long[] time = licenseDateAndTime.findBetweenStartDateAndEnd(dateNow,finalExpiredTime  );
+        return time;
+
+    }
+
+
+
+    public ArrayList<ArrayList> getAllLicenseKey(){
+
+        System.out.println("in get user activate license");
+
+        ////div[@id='data']/div[1]/p[@id='dbID']
+        ArrayList<ArrayList> data = new ArrayList<>();
+
+        driver.get(showAllLicenseUrl);
+
+//        submitAction();
+        List<WebElement> optionCount = driver.findElements(By.xpath("//*[@id=\"data\"]/div"));
+        System.out.println("element size = "+optionCount.size());
+        if (optionCount.size()<=0){
+            data=null;
+        }else {
+            for (int i = 1; i<=optionCount.size(); i++){
+                ArrayList<String> userData = new ArrayList<>();
+                //
+                String dbID = driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbID']")).getText();
+                String dbKey = encryp.decrypt(driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbKey']")).getText());
+                String dbDuration = encryp.decrypt(driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbDuration']")).getText());
+                String dbIsActivate = driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbIsActivate']")).getText();
+                String dbActivateByUser = encryp.decrypt(driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbActivateByUser']")).getText());
+                String dbActivateTime = driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbActivateTime']")).getText();
+                String dbExpiredTime = driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbExpiredTime']")).getText();
+
+                userData.add(dbID);
+                userData.add(dbKey);
+                userData.add(dbDuration);
+                userData.add(dbIsActivate);
+                userData.add(dbActivateByUser);
+                userData.add(dbActivateTime);
+                userData.add(dbExpiredTime);
+
+                data.add(userData);
+            }
+        }
+
+
+        return data;
+    }
+
+    public void addNewLicenseKey(String keyName,String duration){
+        keyName = encryp.encrypt(keyName);
+        duration = encryp.encrypt(String.valueOf(duration));
+        driver.get(licenseManagerUrl);
+        driver.findElement(By.xpath("/html/body/form/input[1]")).sendKeys(keyName);
+        driver.findElement(By.xpath("/html/body/form/input[2]")).sendKeys(String.valueOf(duration));
+        submitAction();
+    }
+
+
+    public ArrayList<ArrayList> getAllUser(){
+
+        System.out.println("in get user activate license");
+
+        ////div[@id='data']/div[1]/p[@id='dbID']
+        ArrayList<ArrayList> data = new ArrayList<>();
+
+        driver.get(showUser);
+
+//        submitAction();
+        List<WebElement> optionCount = driver.findElements(By.xpath("//*[@id=\"data\"]/div"));
+        System.out.println("element size = "+optionCount.size());
+        if (optionCount.size()<=0){
+            data=null;
+        }else {
+            for (int i = 1; i<=optionCount.size(); i++){
+                ArrayList<String> userData = new ArrayList<>();
+                //
+                String dbID = driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbID']")).getText();
+                String dbUser = encryp.decrypt(driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbUsername']")).getText());
+                String dbPassword = encryp.decrypt(driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbPassword']")).getText());
+                String dbFullName = encryp.decrypt(driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbFullName']")).getText());
+                String dbEmail = encryp.decrypt(driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbEmail']")).getText());
+//                String dbActivateTime = driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbActivateTime']")).getText();
+//                String dbExpiredTime = driver.findElement(By.xpath("//div[@id='data']/div["+i+"]/p[@id='dbExpiredTime']")).getText();
+
+                userData.add(dbID);
+                userData.add(dbUser);
+                userData.add(dbPassword);
+                userData.add(dbFullName);
+                userData.add(dbEmail);
+//                userData.add(dbKey);
+//                userData.add(dbDuration);
+//                userData.add(dbIsActivate);
+//                userData.add(dbActivateByUser);
+//                userData.add(dbActivateTime);
+//                userData.add(dbExpiredTime);
+
+                data.add(userData);
+            }
+        }
+
+
+        return data;
+    }
+
+    public void deleteLicense(String licenseId){
+        driver.get(deleteLicenseUrl);
+        driver.findElement(By.xpath("/html/body/form/input[1]")).sendKeys(licenseId);
+        submitAction();
+//        String status = driver.findElement(By.xpath("/html/body/text()")).getText();
+//        System.out.println("delete status :"+status+":");
+//        return true;
+    }
+
+
+    public boolean updateUserData(String ID,String username, String password, String fullname, String email){
+
+        boolean isSuccess = true;
+        driver.get(updateUserDataUrl);
+        driver.findElement(By.xpath("/html/body/form/input[1]")).sendKeys(ID);
+        driver.findElement(By.xpath("/html/body/form/input[2]")).sendKeys(username);
+        driver.findElement(By.xpath("/html/body/form/input[3]")).sendKeys(password);
+        driver.findElement(By.xpath("/html/body/form/input[4]")).sendKeys(fullname);
+        driver.findElement(By.xpath("/html/body/form/input[5]")).sendKeys(email );
+        submitAction();
+
+        String status = driver.findElement(By.xpath("//*[@id=\"status\"]")).getText();
+        if (status.equals("success")){
+            isSuccess = true;
+        }else {
+            isSuccess = false;
+        }
+
+        return isSuccess;
+
+    }
+
+
+    public void deleteUser(String id){
+        boolean isSuccess = false;
+
+        driver.get(deleteUserUrl);
+        driver.findElement(By.xpath("/html/body/form/input[1]")).sendKeys(id);
+        submitAction();
+
+//        String status = driver.findElement(By.xpath("//*[@id=\"status\"]")).getText();
+//        if (status.equals("success")){
+//            isSuccess = true;
+//        }else {
+//            isSuccess = false;
+//        }
+//
+//        return isSuccess;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}

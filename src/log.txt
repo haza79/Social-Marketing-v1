@@ -1,0 +1,32 @@
+Connected to the database!
+english
+thai disable english select
+remember is null
+Exception in thread "main" net.ucanaccess.jdbc.UcanaccessSQLException: UCAExc:::5.0.1 given file does not exist: C:/RPN/db/number.accdb
+	at net.ucanaccess.jdbc.UcanaccessDriver.connect(UcanaccessDriver.java:231)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:677)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:251)
+	at com.german.DatabaseAction.<init>(DatabaseAction.java:29)
+	at com.german.MainForm.<init>(MainForm.java:624)
+	at com.german.MainForm.main(MainForm.java:1764)
+Caused by: java.io.FileNotFoundException: given file does not exist: C:/RPN/db/number.accdb
+	at com.healthmarketscience.jackcess.impl.DatabaseImpl.open(DatabaseImpl.java:387)
+	at com.healthmarketscience.jackcess.DatabaseBuilder.open(DatabaseBuilder.java:267)
+	at net.ucanaccess.jdbc.DefaultJackcessOpener.open(DefaultJackcessOpener.java:37)
+	at net.ucanaccess.jdbc.DBReference.<init>(DBReference.java:171)
+	at net.ucanaccess.jdbc.DBReferenceSingleton.loadReference(DBReferenceSingleton.java:51)
+	at net.ucanaccess.jdbc.UcanaccessDriver.connect(UcanaccessDriver.java:91)
+	... 5 more
+click
+AtAVbv50aOqm7IS9sYKsfw==
+SZwlUM/FQkZz4Z3mTNdAtQ==
+Login successful!
+-- user activate license --
+in get user activate license
+data = []
+license date []
+license date = not null []
+final expired from php action : null
+final expired time from main : null
+null
+-- user activate license --

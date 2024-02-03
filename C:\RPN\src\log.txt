@@ -1,0 +1,31 @@
+Feb 03, 2024 3:34:02 PM io.github.bonigarcia.wdm.WebDriverManager setup
+INFO: Please answer the following questionnaire based on your experience with WebDriverManager. Thanks a lot!
+Feb 03, 2024 3:34:02 PM io.github.bonigarcia.wdm.WebDriverManager setup
+INFO: ====> http://tiny.cc/wdm-survey <====
+Feb 03, 2024 3:34:04 PM io.github.bonigarcia.wdm.WebDriverManager exportDriver
+INFO: Exporting webdriver.chrome.driver as /home/chongoen/.m2/repository/webdriver/chromedriver/linux64/114.0.5735.90/chromedriver
+Starting ChromeDriver 114.0.5735.90 (386bc09e8f4f2e025eddae123f36f6263096ae49-refs/branch-heads/5735@{#1052}) on port 47843
+Only local connections are allowed.
+Please see https://chromedriver.chromium.org/security-considerations for suggestions on keeping ChromeDriver safe.
+ChromeDriver was started successfully.
+Exception in thread "main" org.openqa.selenium.SessionNotCreatedException: Could not start a new session. Response code 500. Message: unknown error: cannot find Chrome binary
+Build info: version: '4.1.0', revision: '87802e897b'
+System info: host: 'chongoen-VivoBook-ASUSLaptop-X412DA-X412DA', ip: '127.0.1.1', os.name: 'Linux', os.arch: 'amd64', os.version: '5.15.0-91-generic', java.version: '15.0.10'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Command: [null, newSession {capabilities=[Capabilities {browserName: chrome, goog:chromeOptions: {args: [--headless], extensions: []}}], desiredCapabilities=Capabilities {browserName: chrome, goog:chromeOptions: {args: [--headless], extensions: []}}}]
+	at org.openqa.selenium.remote.ProtocolHandshake.createSession(ProtocolHandshake.java:126)
+	at org.openqa.selenium.remote.ProtocolHandshake.createSession(ProtocolHandshake.java:84)
+	at org.openqa.selenium.remote.ProtocolHandshake.createSession(ProtocolHandshake.java:62)
+	at org.openqa.selenium.remote.HttpCommandExecutor.execute(HttpCommandExecutor.java:156)
+	at org.openqa.selenium.remote.service.DriverCommandExecutor.invokeExecute(DriverCommandExecutor.java:164)
+	at org.openqa.selenium.remote.service.DriverCommandExecutor.execute(DriverCommandExecutor.java:139)
+	at org.openqa.selenium.remote.RemoteWebDriver.execute(RemoteWebDriver.java:559)
+	at org.openqa.selenium.remote.RemoteWebDriver.startSession(RemoteWebDriver.java:246)
+	at org.openqa.selenium.remote.RemoteWebDriver.<init>(RemoteWebDriver.java:168)
+	at org.openqa.selenium.chromium.ChromiumDriver.<init>(ChromiumDriver.java:108)
+	at org.openqa.selenium.chrome.ChromeDriver.<init>(ChromeDriver.java:104)
+	at org.openqa.selenium.chrome.ChromeDriver.<init>(ChromeDriver.java:91)
+	at org.openqa.selenium.chrome.ChromeDriver.<init>(ChromeDriver.java:80)
+	at com.german.PHPAction.<init>(PHPAction.java:50)
+	at com.german.MainForm.<init>(MainForm.java:188)
+	at com.german.MainForm.main(MainForm.java:1736)
